@@ -665,6 +665,32 @@ $(selector).selectivity(<span class="string">'data'</span>, [{ id: 1, text: <spa
 
 <p><code>$(selector).selectivity(<span class="string">'remove'</span>, { id: 1, text: <span class="string">'Amsterdam'</span> })</code></p>
 
+<h2>setOptions</h2>
+
+<p>Sets one or more options of the Selectivity instance.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Argument</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>options</td>
+            <td><code>Object</code></td>
+            <td>Object with one or more options. All options that can be passed to the constructor
+                are valid, with the exception of <code>data</code> and <code>value</code>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><b>Example:</b></p>
+
+<p><code>$(selector).setOptions({ readOnly: true })</code></p>
+
 <h2>value / val</h2>
 
 <p>Sets or gets the value of the selection. If no argument is given, the current value is returned.
