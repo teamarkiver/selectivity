@@ -1,6 +1,79 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.selectivity=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-_dereq_(4);_dereq_(5);_dereq_(6);_dereq_(8);_dereq_(9);_dereq_(10);_dereq_(11);_dereq_(12);_dereq_(13);_dereq_(14);_dereq_(15);_dereq_(16);_dereq_(17);_dereq_(18);module.exports=_dereq_(7);
-},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"18":18,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9}],2:[function(_dereq_,module,exports){
+_dereq_(5);_dereq_(6);_dereq_(7);_dereq_(9);_dereq_(10);_dereq_(11);_dereq_(12);_dereq_(13);_dereq_(14);_dereq_(15);_dereq_(16);_dereq_(17);_dereq_(18);_dereq_(19);module.exports=_dereq_(8);
+},{"10":10,"11":11,"12":12,"13":13,"14":14,"15":15,"16":16,"17":17,"18":18,"19":19,"5":5,"6":6,"7":7,"8":8,"9":9}],2:[function(_dereq_,module,exports){
+'use strict';
+
+var $ = window.jQuery || window.Zepto;
+
+/**
+ * Event Delegator Constructor.
+ */
+function EventDelegator() {
+
+    this._events = [];
+
+    this.delegateEvents();
+}
+
+/**
+ * Methods.
+ */
+$.extend(EventDelegator.prototype, {
+
+    /**
+     * Attaches all listeners from the events map to the instance's element.
+     *
+     * Normally, you should not have to call this method yourself as it's called automatically in
+     * the constructor.
+     */
+    delegateEvents: function() {
+
+        this.undelegateEvents();
+
+        $.each(this.events, function(event, listener) {
+            var selector, index = event.indexOf(' ');
+            if (index > -1) {
+                selector = event.slice(index + 1);
+                event = event.slice(0, index);
+            }
+
+            if ($.type(listener) === 'string') {
+                listener = this[listener];
+            }
+
+            listener = listener.bind(this);
+
+            if (selector) {
+                this.$el.on(event, selector, listener);
+            } else {
+                this.$el.on(event, listener);
+            }
+
+            this._events.push({ event: event, selector: selector, listener: listener });
+        }.bind(this));
+    },
+
+    /**
+     * Detaches all listeners from the events map from the instance's element.
+     */
+    undelegateEvents: function() {
+
+        this._events.forEach(function(event) {
+            if (event.selector) {
+                this.$el.off(event.event, event.selector, event.listener);
+            } else {
+                this.$el.off(event.event, event.listener);
+            }
+        }, this);
+
+        this._events = [];
+    }
+
+});
+
+module.exports = EventDelegator;
+
+},{"jquery":"jquery"}],3:[function(_dereq_,module,exports){
 'use strict';
 
 /**
@@ -88,7 +161,7 @@ function debounce(func, wait) {
 
 module.exports = debounce;
 
-},{}],3:[function(_dereq_,module,exports){
+},{}],4:[function(_dereq_,module,exports){
 'use strict';
 
 /**
@@ -141,16 +214,16 @@ function escape(string) {
 
 module.exports = escape;
 
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var debounce = _dereq_(2);
+var debounce = _dereq_(3);
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
-_dereq_(12);
+_dereq_(13);
 
 /**
  * Option listener that implements a convenience query function for performing AJAX requests.
@@ -216,10 +289,10 @@ Selectivity.OptionListeners.unshift(function(selectivity, options) {
     }
 });
 
-},{"12":12,"2":2,"7":7,"jquery":"jquery"}],5:[function(_dereq_,module,exports){
+},{"13":13,"3":3,"8":8,"jquery":"jquery"}],6:[function(_dereq_,module,exports){
 'use strict';
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 var latestQueryNum = 0;
 
@@ -252,12 +325,12 @@ Selectivity.OptionListeners.push(function(selectivity, options) {
     }
 });
 
-},{"7":7}],6:[function(_dereq_,module,exports){
+},{"8":8}],7:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var SelectivityDropdown = _dereq_(9);
+var SelectivityDropdown = _dereq_(10);
 
 /**
  * Methods.
@@ -296,10 +369,12 @@ $.extend(SelectivityDropdown.prototype, {
 
 });
 
-},{"9":9,"jquery":"jquery"}],7:[function(_dereq_,module,exports){
+},{"10":10,"jquery":"jquery"}],8:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
+
+var EventDelegator = _dereq_(2);
 
 /**
  * Create a new Selectivity instance or invoke a method on an instance.
@@ -487,19 +562,17 @@ function Selectivity(options) {
         this.data(options.data || null, { triggerChange: false });
     }
 
-    this._events = [];
-
     this._$searchInputs = [];
 
     this.$el.on('selectivity-close', this._closed.bind(this));
 
-    this.delegateEvents();
+    EventDelegator.call(this);
 }
 
 /**
  * Methods.
  */
-$.extend(Selectivity.prototype, {
+$.extend(Selectivity.prototype, EventDelegator.prototype, {
 
     /**
      * Convenience shortcut for this.$el.find(selector).
@@ -550,39 +623,6 @@ $.extend(Selectivity.prototype, {
                 this.triggerChange();
             }
         }
-    },
-
-    /**
-     * Attaches all listeners from the events map to the instance's element.
-     *
-     * Normally, you should not have to call this method yourself as it's called automatically in
-     * the constructor.
-     */
-    delegateEvents: function() {
-
-        this.undelegateEvents();
-
-        $.each(this.events, function(event, listener) {
-            var selector, index = event.indexOf(' ');
-            if (index > -1) {
-                selector = event.slice(index + 1);
-                event = event.slice(0, index);
-            }
-
-            if ($.type(listener) === 'string') {
-                listener = this[listener];
-            }
-
-            listener = listener.bind(this);
-
-            if (selector) {
-                this.$el.on(event, selector, listener);
-            } else {
-                this.$el.on(event, listener);
-            }
-
-            this._events.push({ event: event, selector: selector, listener: listener });
-        }.bind(this));
     },
 
     /**
@@ -969,25 +1009,6 @@ $.extend(Selectivity.prototype, {
         var event = $.Event(eventName, data || {});
         this.$el.trigger(event);
         return !event.isDefaultPrevented();
-    },
-
-    /**
-     * Detaches all listeners from the events map from the instance's element.
-     *
-     * Normally, you should not have to call this method yourself as it's called automatically in
-     * the destroy() method.
-     */
-    undelegateEvents: function() {
-
-        this._events.forEach(function(event) {
-            if (event.selector) {
-                this.$el.off(event.event, event.selector, event.listener);
-            } else {
-                this.$el.off(event.event, event.listener);
-            }
-        }, this);
-
-        this._events = [];
     },
 
     /**
@@ -1393,7 +1414,7 @@ Selectivity.transformText = function(string) {
 
 module.exports = $.fn.selectivity = Selectivity;
 
-},{"jquery":"jquery"}],8:[function(_dereq_,module,exports){
+},{"2":2,"jquery":"jquery"}],9:[function(_dereq_,module,exports){
 'use strict';
 
 var DIACRITICS = {
@@ -2238,7 +2259,7 @@ var DIACRITICS = {
     '\u03C2': '\u03C3'
 };
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 var previousTransform = Selectivity.transformText;
 
 /**
@@ -2257,14 +2278,16 @@ Selectivity.transformText = function(string) {
     return previousTransform(result);
 };
 
-},{"7":7}],9:[function(_dereq_,module,exports){
+},{"8":8}],10:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var debounce = _dereq_(2);
+var debounce = _dereq_(3);
 
-var Selectivity = _dereq_(7);
+var EventDelegator = _dereq_(2);
+
+var Selectivity = _dereq_(8);
 
 /**
  * selectivity Dropdown Constructor.
@@ -2324,11 +2347,11 @@ function SelectivityDropdown(options) {
         selectivity.$el.on('selectivity-selecting', this._closeProxy);
     }
 
+    this._lastMousePosition = {};
+
     this.addToDom();
     this.position();
     this.setupCloseHandler();
-
-    this._scrolledProxy = debounce(this._scrolled.bind(this), 50);
 
     this._suppressMouseWheel();
 
@@ -2337,7 +2360,9 @@ function SelectivityDropdown(options) {
         selectivity.focus();
     }
 
-    this._delegateEvents();
+    EventDelegator.call(this);
+
+    this.$results.on('scroll touchmove touchend', debounce(this._scrolled.bind(this), 50));
 
     this.showLoading();
 
@@ -2347,7 +2372,7 @@ function SelectivityDropdown(options) {
 /**
  * Methods.
  */
-$.extend(SelectivityDropdown.prototype, {
+$.extend(SelectivityDropdown.prototype, EventDelegator.prototype, {
 
     /**
      * Convenience shortcut for this.$el.find(selector).
@@ -2362,7 +2387,12 @@ $.extend(SelectivityDropdown.prototype, {
      */
     addToDom: function() {
 
-        this.$el.appendTo(this.selectivity.$el[0].ownerDocument.body);
+        var $next;
+        var $anchor = this.selectivity.$el;
+        while (($next = $anchor.next('.selectivity-dropdown')).length) {
+            $anchor = $next;
+        }
+        this.$el.insertAfter($anchor);
     },
 
     /**
@@ -2391,8 +2421,9 @@ $.extend(SelectivityDropdown.prototype, {
     events: {
         'click .selectivity-load-more': '_loadMoreClicked',
         'click .selectivity-result-item': '_resultClicked',
-        'mouseenter .selectivity-load-more': 'highlightLoadMore',
-        'mouseenter .selectivity-result-item': '_resultHovered'
+        'mouseenter .selectivity-load-more': '_loadMoreHovered',
+        'mouseenter .selectivity-result-item': '_resultHovered',
+        'mousemove': '_recordMousePosition'
     },
 
     /**
@@ -2613,28 +2644,6 @@ $.extend(SelectivityDropdown.prototype, {
     /**
      * @private
      */
-    _delegateEvents: function() {
-
-        $.each(this.events, function(event, listener) {
-            var index = event.indexOf(' ');
-            var selector = event.slice(index + 1);
-            event = event.slice(0, index);
-
-            if ($.type(listener) === 'string') {
-                listener = this[listener];
-            }
-
-            listener = listener.bind(this);
-
-            this.$el.on(event, selector, listener);
-        }.bind(this));
-
-        this.$results.on('scroll touchmove touchend', this._scrolledProxy);
-    },
-
-    /**
-     * @private
-     */
     _highlightFirstItem: function(results) {
 
         function findFirstItem(results) {
@@ -2677,6 +2686,27 @@ $.extend(SelectivityDropdown.prototype, {
     /**
      * @private
      */
+    _loadMoreHovered: function(event) {
+
+        if (event.screenX === undefined || event.screenX !== this._lastMousePosition.x ||
+            event.screenY === undefined || event.screenY !== this._lastMousePosition.y) {
+            this.highlightLoadMore();
+
+            this._recordMousePosition(event);
+        }
+    },
+
+    /**
+     * @private
+     */
+    _recordMousePosition: function(event) {
+
+        this._lastMousePosition = { x: event.screenX, y: event.screenY };
+    },
+
+    /**
+     * @private
+     */
     _resultClicked: function(event) {
 
         this.selectItem(this.selectivity._getItemId(event));
@@ -2689,10 +2719,15 @@ $.extend(SelectivityDropdown.prototype, {
      */
     _resultHovered: function(event) {
 
-        var id = this.selectivity._getItemId(event);
-        var item = Selectivity.findNestedById(this.results, id);
-        if (item) {
-            this.highlight(item);
+        if (event.screenX === undefined || event.screenX !== this._lastMousePosition.x ||
+            event.screenY === undefined || event.screenY !== this._lastMousePosition.y) {
+            var id = this.selectivity._getItemId(event);
+            var item = Selectivity.findNestedById(this.results, id);
+            if (item) {
+                this.highlight(item);
+            }
+
+            this._recordMousePosition(event);
         }
     },
 
@@ -2706,29 +2741,6 @@ $.extend(SelectivityDropdown.prototype, {
             if ($loadMore[0].offsetTop - this.$results[0].scrollTop < this.$el.height()) {
                 this._loadMoreClicked();
             }
-        }
-    },
-
-    /**
-     * @private
-     */
-    _scrollToHighlight: function(options) {
-
-        var el;
-        if (this.highlightedResult) {
-            var quotedId = Selectivity.quoteCssAttr(this.highlightedResult.id);
-            el = this.$('.selectivity-result-item[data-item-id=' + quotedId + ']')[0];
-        } else if (this.loadMoreHighlighted) {
-            el = this.$('.selectivity-load-more')[0];
-        } else {
-            return; // no highlight to scroll to
-        }
-
-        var rect = el.getBoundingClientRect(),
-            containerRect = this.$results[0].getBoundingClientRect();
-
-        if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
-            el.scrollIntoView(options.alignToTop);
         }
     },
 
@@ -2782,13 +2794,13 @@ $.extend(SelectivityDropdown.prototype, {
 
 module.exports = Selectivity.Dropdown = SelectivityDropdown;
 
-},{"2":2,"7":7,"jquery":"jquery"}],10:[function(_dereq_,module,exports){
+},{"2":2,"3":3,"8":8,"jquery":"jquery"}],11:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var Selectivity = _dereq_(7);
-var MultipleSelectivity = _dereq_(13);
+var Selectivity = _dereq_(8);
+var MultipleSelectivity = _dereq_(14);
 
 function isValidEmail(email) {
 
@@ -2947,10 +2959,10 @@ var callSuper = Selectivity.inherits(Emailselectivity, MultipleSelectivity, {
 
 module.exports = Selectivity.InputTypes.Email = Emailselectivity;
 
-},{"13":13,"7":7,"jquery":"jquery"}],11:[function(_dereq_,module,exports){
+},{"14":14,"8":8,"jquery":"jquery"}],12:[function(_dereq_,module,exports){
 'use strict';
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 var KEY_BACKSPACE = 8;
 var KEY_DOWN_ARROW = 40;
@@ -2963,6 +2975,9 @@ var KEY_UP_ARROW = 38;
  * Search input listener providing keyboard support for navigating the dropdown.
  */
 function listener(selectivity, $input) {
+
+    var keydownCanceled = false;
+    var closeSubmenu = null;
 
     /**
      * Moves a dropdown's highlight to the next or previous result item.
@@ -2981,21 +2996,27 @@ function listener(selectivity, $input) {
         }
 
         function scrollToHighlight() {
-            var el;
+            var $el;
             if (dropdown.highlightedResult) {
                 var quotedId = Selectivity.quoteCssAttr(dropdown.highlightedResult.id);
-                el = dropdown.$('.selectivity-result-item[data-item-id=' + quotedId + ']')[0];
+                $el = dropdown.$('.selectivity-result-item[data-item-id=' + quotedId + ']');
             } else if (dropdown.loadMoreHighlighted) {
-                el = dropdown.$('.selectivity-load-more')[0];
+                $el = dropdown.$('.selectivity-load-more');
             } else {
                 return; // no highlight to scroll to
             }
 
-            var rect = el.getBoundingClientRect(),
-                containerRect = dropdown.$results[0].getBoundingClientRect();
+            var position = $el.position();
+            if (!position) {
+                return;
+            }
 
-            if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
-                el.scrollIntoView(delta < 0);
+            var top = position.top;
+            var elHeight = $el.height();
+            var resultsHeight = dropdown.$results.height();
+            if (top < 0 || top > resultsHeight - elHeight) {
+                top += dropdown.$results.scrollTop();
+                dropdown.$results.scrollTop(delta < 0 ? top : top - resultsHeight + elHeight);
             }
         }
 
@@ -3027,7 +3048,7 @@ function listener(selectivity, $input) {
             var result = Selectivity.findNestedById(results,
                                                     selectivity._getItemId($results[index]));
             if (result) {
-                dropdown.highlight(result);
+                dropdown.highlight(result, { delay: !!result.submenu });
                 scrollToHighlight();
             }
         }
@@ -3037,7 +3058,20 @@ function listener(selectivity, $input) {
 
         var dropdown = selectivity.dropdown;
         if (dropdown) {
-            if (event.keyCode === KEY_DOWN_ARROW) {
+            if (event.keyCode === KEY_BACKSPACE) {
+                if (!$input.val()) {
+                    if (dropdown.submenu) {
+                        var submenu = dropdown.submenu;
+                        while (submenu.submenu) {
+                            submenu = submenu.submenu;
+                        }
+                        closeSubmenu = submenu;
+                    }
+
+                    event.preventDefault();
+                    keydownCanceled = true;
+                }
+            } else if (event.keyCode === KEY_DOWN_ARROW) {
                 moveHighlight(dropdown, 1);
             } else if (event.keyCode === KEY_UP_ARROW) {
                 moveHighlight(dropdown, -1);
@@ -3058,18 +3092,18 @@ function listener(selectivity, $input) {
         }
 
         var dropdown = selectivity.dropdown;
-        if (event.keyCode === KEY_BACKSPACE) {
-            if (!$input.val()) {
-                if (dropdown && dropdown.submenu) {
-                    var submenu = dropdown.submenu;
-                    while (submenu.submenu) {
-                        submenu = submenu.submenu;
-                    }
-                    submenu.close();
-                    selectivity.focus();
-                }
+        if (keydownCanceled) {
+            event.preventDefault();
+            keydownCanceled = false;
 
-                event.preventDefault();
+            if (closeSubmenu) {
+                closeSubmenu.close();
+                selectivity.focus();
+                closeSubmenu = null;
+            }
+        } else if (event.keyCode === KEY_BACKSPACE) {
+            if (!dropdown && selectivity.options.allowClear) {
+                selectivity.clear();
             }
         } else if (event.keyCode === KEY_ENTER && !event.ctrlKey) {
             if (dropdown) {
@@ -3100,11 +3134,11 @@ function listener(selectivity, $input) {
 
 Selectivity.SearchInputListeners.push(listener);
 
-},{"7":7}],12:[function(_dereq_,module,exports){
+},{"8":8}],13:[function(_dereq_,module,exports){
 'use strict';
 
-var escape = _dereq_(3);
-var Selectivity = _dereq_(7);
+var escape = _dereq_(4);
+var Selectivity = _dereq_(8);
 
 /**
  * Localizable elements of the Selectivity Templates.
@@ -3125,12 +3159,12 @@ Selectivity.Locale = {
 
 };
 
-},{"3":3,"7":7}],13:[function(_dereq_,module,exports){
+},{"4":4,"8":8}],14:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 var KEY_BACKSPACE = 8;
 var KEY_DELETE = 46;
@@ -3146,7 +3180,8 @@ function MultipleSelectivity(options) {
 
     Selectivity.call(this, options);
 
-    this.$el.html(this.template('multipleSelectInput', { enabled: this.enabled }));
+    this.$el.html(this.template('multipleSelectInput', { enabled: this.enabled }))
+            .trigger('selectivity-init', 'multiple');
 
     this._highlightedItemId = null;
 
@@ -3155,17 +3190,23 @@ function MultipleSelectivity(options) {
     this._rerenderSelection();
 
     if (!options.positionDropdown) {
+        // dropdowns for multiple-value inputs should open below the select box,
+        // unless there is not enough space below, but there is space enough above, then it should
+        // open upwards
         this.options.positionDropdown = function($el, $selectEl) {
-            var offset = $selectEl.offset(),
-                elHeight = $el.height(),
+            var position = $selectEl.position(),
+                dropdownHeight = $el.height(),
                 selectHeight = $selectEl.height(),
-                bottom = $selectEl[0].getBoundingClientRect().top + selectHeight + elHeight;
+                top = $selectEl[0].getBoundingClientRect().top,
+                bottom = top + selectHeight + dropdownHeight,
+                openUpwards = (typeof window !== 'undefined' && bottom > $(window).height() &&
+                               top - dropdownHeight > 0);
 
+            var width = $selectEl.outerWidth ? $selectEl.outerWidth() : $selectEl.width();
             $el.css({
-                left: offset.left + 'px',
-                top: offset.top + (typeof window !== 'undefined' &&
-                                   bottom > $(window).height() ? -elHeight : selectHeight) + 'px'
-            }).width($selectEl.width());
+                left: position.left + 'px',
+                top: position.top + (openUpwards ? -dropdownHeight : selectHeight) + 'px'
+            }).width(width);
         };
     }
 }
@@ -3671,12 +3712,12 @@ var callSuper = Selectivity.inherits(MultipleSelectivity, {
 
 module.exports = Selectivity.InputTypes.Multiple = MultipleSelectivity;
 
-},{"7":7,"jquery":"jquery"}],14:[function(_dereq_,module,exports){
+},{"8":8,"jquery":"jquery"}],15:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 /**
  * SingleSelectivity Constructor.
@@ -3688,26 +3729,32 @@ function SingleSelectivity(options) {
 
     Selectivity.call(this, options);
 
-    this.$el.html(this.template('singleSelectInput', this.options));
+    this.$el.html(this.template('singleSelectInput', this.options))
+            .trigger('selectivity-init', 'single');
 
     this._rerenderSelection();
 
     if (!options.positionDropdown) {
+        // dropdowns for single-value inputs should open below the select box,
+        // unless there is not enough space below, in which case the dropdown should be moved up
+        // just enough so it fits in the window, but never so much that it reaches above the top
         this.options.positionDropdown = function($el, $selectEl) {
-            var offset = $selectEl.offset(),
-                top = offset.top + $selectEl.height();
+            var position = $selectEl.position(),
+                dropdownHeight = $el.height(),
+                selectHeight = $selectEl.height(),
+                top = $selectEl[0].getBoundingClientRect().top,
+                bottom = top + selectHeight + dropdownHeight,
+                deltaUp = 0;
 
             if (typeof window !== 'undefined') {
-                var fixedOffset = $selectEl[0].getBoundingClientRect(),
-                    elHeight = $el.height(),
-                    windowHeight = $(window).height();
-
-                if (fixedOffset.top + elHeight > windowHeight) {
-                    top = Math.max(windowHeight - elHeight + offset.top - fixedOffset.top, 0);
-                }
+                deltaUp = Math.min(Math.max(bottom - $(window).height(), 0), top + selectHeight);
             }
 
-            $el.css({ left: offset.left + 'px', top: top + 'px' }).width($selectEl.width());
+            var width = $selectEl.outerWidth ? $selectEl.outerWidth() : $selectEl.width();
+            $el.css({
+                left: position.left + 'px',
+                top: (position.top + selectHeight - deltaUp) + 'px'
+            }).width(width);
         };
     }
 
@@ -3753,8 +3800,13 @@ var callSuper = Selectivity.inherits(SingleSelectivity, {
 
         callSuper(this, 'close');
 
+        var $input = this.$('.selectivity-single-select-input');
+        if (!this.$searchInput) {
+            this.initSearchInput($input, { noSearch: true });
+        }
+
         if (!options || options.keepFocus !== false) {
-            this.$('.selectivity-single-select-input').focus();
+            $input.focus();
         }
 
         this._closing = false;
@@ -3922,11 +3974,11 @@ var callSuper = Selectivity.inherits(SingleSelectivity, {
 
 module.exports = Selectivity.InputTypes.Single = SingleSelectivity;
 
-},{"7":7,"jquery":"jquery"}],15:[function(_dereq_,module,exports){
+},{"8":8,"jquery":"jquery"}],16:[function(_dereq_,module,exports){
 'use strict';
 
-var Selectivity = _dereq_(7);
-var SelectivityDropdown = _dereq_(9);
+var Selectivity = _dereq_(8);
+var SelectivityDropdown = _dereq_(10);
 
 /**
  * Extended dropdown that supports submenus.
@@ -3941,6 +3993,8 @@ function SelectivitySubmenu(options) {
     SelectivityDropdown.call(this, options);
 
     this._closeSubmenuTimeout = 0;
+
+    this._openSubmenuTimeout = 0;
 }
 
 var callSuper = Selectivity.inherits(SelectivitySubmenu, SelectivityDropdown, {
@@ -3967,31 +4021,42 @@ var callSuper = Selectivity.inherits(SelectivitySubmenu, SelectivityDropdown, {
             this.parentMenu.submenu = null;
             this.parentMenu = null;
         }
+
+        clearTimeout(this._closeSubmenuTimeout);
+        clearTimeout(this._openSubmenuTimeout);
     },
 
     /**
      * @inherit
+     *
+     * @param options Optional options object. May contain the following property:
+     *                delay - If true, indicates any submenu should not be opened until after some
+     *                        delay.
      */
-    highlight: function(item) {
+    highlight: function(item, options) {
 
-        if (this.submenu) {
-            if (!this.highlightedResult || this.highlightedResult.id !== item.id) {
-                if (this._closeSubmenuTimeout) {
-                    clearTimeout(this._closeSubmenuTimeout);
-                }
+        if (options && options.delay) {
+            callSuper(this, 'highlight', item);
+
+            clearTimeout(this._openSubmenuTimeout);
+            this._openSubmenuTimeout = setTimeout(this._doHighlight.bind(this, item), 300);
+        } else if (this.submenu) {
+            if (this.highlightedResult && this.highlightedResult.id === item.id) {
+                this._doHighlight(item);
+            } else {
+                clearTimeout(this._closeSubmenuTimeout);
                 this._closeSubmenuTimeout = setTimeout(
                     this._closeSubmenuAndHighlight.bind(this, item), 100
                 );
-                return;
             }
         } else {
             if (this.parentMenu && this.parentMenu._closeSubmenuTimeout) {
                 clearTimeout(this.parentMenu._closeSubmenuTimeout);
                 this.parentMenu._closeSubmenuTimeout = 0;
             }
-        }
 
-        this._doHighlight(item);
+            this._doHighlight(item);
+        }
     },
 
     /**
@@ -4087,11 +4152,11 @@ var callSuper = Selectivity.inherits(SelectivitySubmenu, SelectivityDropdown, {
                 this.submenu = new Dropdown({
                     parentMenu: this,
                     position: item.submenu.positionDropdown || function($el) {
-                        var offset = $item.offset();
+                        var dropdownPosition = $dropdownEl.position();
                         var width = $dropdownEl.width();
                         $el.css({
-                            left: offset.left + width + 'px',
-                            top: offset.top + 'px'
+                            left: dropdownPosition.left + width + 'px',
+                            top: $item.position().top + dropdownPosition.top + 'px'
                         }).width(width);
                     },
                     restoreOptions: {
@@ -4137,14 +4202,14 @@ Selectivity.findNestedById = function(array, id) {
 
 module.exports = SelectivitySubmenu;
 
-},{"7":7,"9":9}],16:[function(_dereq_,module,exports){
+},{"10":10,"8":8}],17:[function(_dereq_,module,exports){
 'use strict';
 
-var escape = _dereq_(3);
+var escape = _dereq_(4);
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
-_dereq_(12);
+_dereq_(13);
 
 /**
  * Default set of templates to use with Selectivity.js.
@@ -4281,11 +4346,11 @@ Selectivity.Templates = {
         return (
             '<span class="selectivity-multiple-selected-item' + extraClass + '" ' +
                   'data-item-id="' + escape(options.id) + '">' +
-                escape(options.text) +
                 (options.removable ? '<a class="selectivity-multiple-selected-item-remove">' +
                                          '<i class="fa fa-remove"></i>' +
                                      '</a>'
                                    : '') +
+                escape(options.text) +
             '</span>'
         );
     },
@@ -4407,16 +4472,46 @@ Selectivity.Templates = {
                 escape(options.text) +
             '</span>'
         );
+    },
+
+    /**
+     * Renders select-box inside single-select input that was initialized on
+     * traditional <select> element.
+     *
+     * @param options Options object containing the following properties:
+     *                name - Name of the <select> element.
+     *                mode - Mode in which select exists, single or multiple.
+     */
+    selectCompliance: function(options) {
+        if (options.mode === 'multiple' && options.name.slice(-2) !== '[]') {
+            options.name += '[]';
+        }
+        return ('<select name="' + options.name + '"' + (options.mode === 'multiple' ? ' multiple' : '') + '></select>');
+    },
+
+    /**
+     * Renders the selected item in compliance <select> element as <option>.
+     *
+     * @param options Options object containing the following properties
+     *                id - Identifier for the item.
+     *                text - Text label which the user sees.
+     */
+    selectOptionCompliance: function(options) {
+        return (
+            '<option value="' + escape(options.id) + '" selected>' +
+                escape(options.text) +
+            '</option>'
+        );
     }
 
 };
 
-},{"12":12,"3":3,"7":7}],17:[function(_dereq_,module,exports){
+},{"13":13,"4":4,"8":8}],18:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 function defaultTokenizer(input, selection, createToken, options) {
 
@@ -4478,32 +4573,34 @@ Selectivity.OptionListeners.push(function(selectivity, options) {
     }
 });
 
-},{"7":7,"jquery":"jquery"}],18:[function(_dereq_,module,exports){
+},{"8":8,"jquery":"jquery"}],19:[function(_dereq_,module,exports){
 'use strict';
 
 var $ = window.jQuery || window.Zepto;
 
-var Selectivity = _dereq_(7);
+var Selectivity = _dereq_(8);
 
 function replaceSelectElement($el, options) {
 
-    var value = (options.multiple ? [] : null);
+    var data = (options.multiple ? [] : null);
 
     var mapOptions = function() {
         var $this = $(this);
         if ($this.is('option')) {
-            var id = $this.attr('value') || $this.text();
+            var text = $this.text();
+            var id = $this.attr('value') || text;
             if ($this.prop('selected')) {
+                var item = { id: id, text: text };
                 if (options.multiple) {
-                    value.push(id);
+                    data.push(item);
                 } else {
-                    value = id;
+                    data = item;
                 }
             }
 
             return {
                 id: id,
-                text: $this.attr('label') || $this.text()
+                text: $this.attr('label') || text
             };
         } else {
             return {
@@ -4515,20 +4612,55 @@ function replaceSelectElement($el, options) {
 
     options.allowClear = ('allowClear' in options ? options.allowClear : !$el.prop('required'));
 
-    options.items = $el.children('option,optgroup').map(mapOptions).get();
+    var items = $el.children('option,optgroup').map(mapOptions).get();
+    options.items = (options.query ? null : items);
 
     options.placeholder = options.placeholder || $el.data('placeholder') || '';
 
-    options.value = value;
+    options.data = data;
+
+    var classes = ($el.attr('class') || 'selectivity-input').split(' ');
+    if (classes.indexOf('selectivity-input') === -1) {
+        classes.push('selectivity-input');
+    }
 
     var $div = $('<div>').attr({
-        'class': $el.attr('class'),
         'id': $el.attr('id'),
-        'name': $el.attr('name'),
-        'style': $el.attr('style')
+        'class': classes.join(' '),
+        'style': $el.attr('style'),
+        'data-name': $el.attr('name')
     });
     $el.replaceWith($div);
     return $div;
+}
+
+function bindTraditionalSelectEvents(selectivity) {
+
+    var $el = selectivity.$el;
+
+    $el.on('selectivity-init', function(event, mode) {
+
+            $el.append(selectivity.template('selectCompliance', {name: $el.attr('data-name'), mode: mode}))
+              .removeAttr('data-name');
+        })
+        .on('selectivity-init change', function() {
+            var data = selectivity._data;
+            var $select = $el.find('select');
+
+            if (data instanceof Array) {
+                $select.empty();
+
+                data.forEach(function(item) {
+                    $select.append(selectivity.template('selectOptionCompliance', item));
+                });
+            } else {
+                if (data) {
+                    $select.html(selectivity.template('selectOptionCompliance', data));
+                } else {
+                    $select.empty();
+                }
+            }
+        });
 }
 
 /**
@@ -4547,8 +4679,10 @@ Selectivity.OptionListeners.push(function(selectivity, options) {
 
         selectivity.$el = replaceSelectElement($el, options);
         selectivity.$el[0].selectivity = selectivity;
+
+        bindTraditionalSelectEvents(selectivity);
     }
 });
 
-},{"7":7,"jquery":"jquery"}]},{},[1])(1)
+},{"8":8,"jquery":"jquery"}]},{},[1])(1)
 });
