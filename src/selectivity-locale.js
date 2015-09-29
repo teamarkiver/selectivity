@@ -15,9 +15,9 @@ Selectivity.Locale = {
     loading: 'Loading...',
     loadMore: 'Load more...',
     needMoreCharacters: function(numCharacters) {
-        return 'Enter ' + numCharacters + ' more characters to search';
+        return "Start Typing...";
     },
-    noResults: 'No results found',
+    noResults: 'Start Typing...',
     noResultsForTerm: function(term) { return 'No results for <b>' + escape(term) + '</b>'; }
 
 };
