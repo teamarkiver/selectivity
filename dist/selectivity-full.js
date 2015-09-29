@@ -3175,9 +3175,9 @@ Selectivity.Locale = {
     loading: 'Loading...',
     loadMore: 'Load more...',
     needMoreCharacters: function(numCharacters) {
-        return 'Enter ' + numCharacters + ' more characters to search';
+        return "Start Typing...";
     },
-    noResults: 'No results found',
+    noResults: 'Start Typing...',
     noResultsForTerm: function(term) { return 'No results for <b>' + escape(term) + '</b>'; }
 
 };
@@ -3666,7 +3666,7 @@ var callSuper = Selectivity.inherits(MultipleSelectivity, {
 
         if (event.added || event.removed) {
             if (this.dropdown) {
-                this.dropdown.showResults(this.filterResults(this.results), {
+                this.dropdown.showResults(this.filterResults(this.dropdown.results), {
                     hasMore: this.dropdown.hasMore
                 });
             }
