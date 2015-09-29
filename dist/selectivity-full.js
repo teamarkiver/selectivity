@@ -3178,7 +3178,7 @@ Selectivity.Locale = {
         return "Start Typing...";
     },
     noResults: 'Start Typing...',
-    noResultsForTerm: function(term) { return 'No results for <b>' + escape(term) + '</b>'; }
+    noResultsForTerm: function(term) { return 'New Tag: <b>' + escape(term) + '</b>'; }
 
 };
 
