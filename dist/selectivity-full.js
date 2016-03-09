@@ -3182,7 +3182,7 @@ Selectivity.Locale = {
         return "Start Typing...";
     },
     noResults: 'Start Typing...',
-    noResultsForTerm: function(term) { return 'New Tag: <b>' + escape(term) + '</b>'; }
+    noResultsForTerm: function(term) { return 'New: <b>' + escape(term) + '</b>'; }
 
 };
 
